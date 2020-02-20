@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 
 public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
-    private ThreadLocal<Integer> local = ThreadLocal.withInitial(() -> 0);
+    private ThreadLocal<Long> local = ThreadLocal.withInitial(() -> 0L);
 
 
     public PriorityThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
@@ -37,11 +37,11 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
 
     @Override
     public void execute(Runnable command) {
-        int priority = local.get();
+        long priority = local.get();
         try {
             this.execute(command, priority);
         } finally {
-            local.set(0);
+            local.set(0L);
         }
     }
 
@@ -51,19 +51,19 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
 
-    public <T> Future<T> submit(Callable<T> task, int priority) {
+    public <T> Future<T> submit(Callable<T> task, long priority) {
         local.set(priority);
         return super.submit(task);
     }
 
 
-    public <T> Future<T> submit(Runnable task, T result, int priority) {
+    public <T> Future<T> submit(Runnable task, T result, long priority) {
         local.set(priority);
         return super.submit(task, result);
     }
 
 
-    public Future<?> submit(Runnable task, int priority) {
+    public Future<?> submit(Runnable task, long priority) {
         local.set(priority);
         return super.submit(task);
     }
